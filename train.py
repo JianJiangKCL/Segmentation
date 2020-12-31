@@ -179,7 +179,7 @@ if __name__ == "__main__":
 	parser.add_argument('--img_size', type=int, default=128)
 	parser.add_argument('--n_epochs', type=int, default=100)
 	parser.add_argument('--batch_size', type=int, default=16)
-	parser.add_argument('--lr', type=float, default=3e-4)
+	parser.add_argument('--lr', type=float, default=3e-2)
 	parser.add_argument('--weight_decay', type=float, default=1e-4)
 
 	parser.add_argument('--split_ratio', type=float, default=0.2)
