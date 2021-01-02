@@ -126,7 +126,7 @@ class UNet(nn.Module):
 		# self.conv9 = self.conv_block(kernels * 2, kernels)
 		#
 		# self.conv10 = nn.Conv2d(kernels, 1, 1)
-		self.proj5 = projection_MLP(64, 1024, 64)
+		# self.proj5 = projection_MLP(64, 1024, 64)
 		self._initialize_weights()
 
 	def up_block(self, in_ch, out_ch):
@@ -163,10 +163,10 @@ class UNet(nn.Module):
 		#         (128, 16, 16) -> (256, 16, 16)
 		# 512x8x8
 		x5 = self.conv5(h4)
-		size_x5 = x5.size()
-		x5 = x5.view(-1, size_x5[-1]**2)
-		x5p = self.proj5(x5.detach()).reshape(*size_x5)
-		x5 = x5.reshape(*size_x5)
+		# size_x5 = x5.size()
+		# x5 = x5.view(-1, size_x5[-1]**2)
+		# x5p = self.proj5(x5.detach()).reshape(*size_x5)
+		# x5 = x5.reshape(*size_x5)
 		#         Decoder Part
 		#         (256, 16, 16) -> (128, 32, 32)
 		# x6 = self.up_conv6(x5)
@@ -192,19 +192,19 @@ class UNet(nn.Module):
 		size = fore_out.size()
 		# fore_out = fore_out.view(size[0], -1)
 		# back_out = self.proj5(fore_out.detach()).flatten()
-		fore_out = fore_out.flatten()
+		# fore_out = fore_out.flatten()
 		# back_out = self.back_decoder((x1, x2, x3, x4, x5p)).flatten()
-		back_out = self.fore_decoder((x1, x2, x3, x4, x5p)).flatten().detach()
-		indices = (fore_out < back_out).nonzero()
-		ph_out = fore_out + (1 - back_out)
-		ph_out[indices] = ph_out[indices] - fore_out[indices]
-		back_indices = (fore_out > back_out).nonzero()
-		ph_out[back_indices] = ph_out[back_indices] + back_out[back_indices] - 1
-		# print('---------------------')
-		# print(indices.size())
-		# print(fore_out.size())
-		ph_out = ph_out.reshape(*size)
-		return ph_out
+		back_out = self.back_decoder((x1, x2, x3, x4, x5))#.flatten()
+		# indices = (fore_out < back_out).nonzero()
+		# ph_out = fore_out + (1 - back_out)
+		# ph_out[indices] = ph_out[indices] - fore_out[indices]
+		# back_indices = (fore_out > back_out).nonzero()
+		# ph_out[back_indices] = ph_out[back_indices] + back_out[back_indices] - 1
+		# # print('---------------------')
+		# # print(indices.size())
+		# # print(fore_out.size())
+		# ph_out = ph_out.reshape(*size)
+		return fore_out, back_out
 
 	def _initialize_weights(self):
 		for m in self.modules():
