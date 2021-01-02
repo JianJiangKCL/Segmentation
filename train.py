@@ -99,7 +99,7 @@ class DualLoss(nn.Module):
         encourgement_loss = self.criterion(front*target, target) + self.criterion(back*(1-target), 1-target)
         zeros = torch.zeros_like(target).cuda()
         ones = torch.ones_like(target).cuda()
-        punishment_loss = self.criterion(front * (1 - target), zeros) + self.criterion(back * target, zeros)
+        punishment_loss = self.criterion(front*back.detach(), zeros) + self.criterion(back*front.detach(), zeros)
         if self.ratio_decay:
             loss = self.enc_ratio * encourgement_loss + self.pub_ratio * punishment_loss
         else:
