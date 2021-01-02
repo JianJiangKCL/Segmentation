@@ -96,13 +96,14 @@ class DualLoss(nn.Module):
         self.pub_ratio = 1 - self.enc_ratio
 
     def forward(self, front, back, target):
-        loss = self.criterion(front, target) + self.criterion(back, 1-target)
-        # encourgement_loss = self.criterion(front*target, target) + self.criterion(back*(1-target), 1-target)
-        # punishment_loss = self.criterion(front*(1-target), target) + self.criterion(back*target, 1-target)
-        # if self.ratio_decay:
-        #     loss = self.enc_ratio * encourgement_loss + self.pub_ratio * punishment_loss
-        # else:
-        #     loss = self.init_enc_ratio * encourgement_loss + self.init_pub_ratio * punishment_loss
+        encourgement_loss = self.criterion(front*target, target) + self.criterion(back*(1-target), 1-target)
+        zeros = torch.zeros_like(target).cuda()
+        ones = torch.ones_like(target).cuda()
+        punishment_loss = self.criterion(front * (1 - target), zeros) + self.criterion(back * target, zeros)
+        if self.ratio_decay:
+            loss = self.enc_ratio * encourgement_loss + self.pub_ratio * punishment_loss
+        else:
+            loss = self.init_enc_ratio * encourgement_loss + self.init_pub_ratio * punishment_loss
         return loss
 
 def compute_iou(y_true, y_pred):
